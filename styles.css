@@ -130,13 +130,28 @@ img{ max-width:100%; display:block; }
   cursor:pointer;
   display:inline-flex;
   align-items:center;
-  gap:8px;
+  gap:10px;
   transition:.18s ease;
   position:relative;
   z-index:81;
 }
 .hmenu__btn:hover{ background: rgba(245,243,238,.10); }
-.hmenu__chev{ opacity:.9; font-size:12px; }
+
+/* ✅ NEW: hamburger icon instead of chevron */
+.hmenu__icon{
+  width:18px;
+  height:14px;
+  display:grid;
+  gap:3px;
+  align-content:center;
+}
+.hmenu__icon span{
+  display:block;
+  height:2px;
+  border-radius:999px;
+  background: rgba(245,243,238,.92);
+  opacity:.95;
+}
 
 .hmenu__panel{
   position:absolute;
@@ -220,9 +235,20 @@ img{ max-width:100%; display:block; }
 .iconbtn:hover{ transform: translateY(-1px); background: rgba(245,243,238,.08); }
 .iconbtn svg{ width:20px; height:20px; }
 
+/* ✅ NEW: make Facebook SVG bigger without changing box size */
+.iconbtn--facebook svg{
+  width:24px;
+  height:24px;
+}
+
+/* ✅ UPDATED: center EN/AR perfectly inside the box */
 .langbtn{
   height:36px;
-  padding:0 12px;
+
+  /* ✅ width fixed so text stays centered */
+  width:44px;
+  padding:0;
+
   border-radius:12px;
   border:1px solid rgba(208,179,113,.18);
   background: rgba(245,243,238,.05);
@@ -230,6 +256,14 @@ img{ max-width:100%; display:block; }
   font-weight:800;
   cursor:pointer;
   font-size:13px;
+
+  /* ✅ true centering */
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  line-height:1;
+  text-align:center;
 }
 
 /* ================= HERO ================= */
@@ -326,9 +360,11 @@ img{ max-width:100%; display:block; }
   margin:0 0 10px;
 }
 
+/* ✅ FIX: bullets spacing works in both RTL/LTR (prevents sticking in English) */
 .bullets{
   margin:0;
-  padding:0 18px 0 0;
+  padding-inline-start: 18px;
+  padding-inline-end: 0;
 }
 .bullets li{ margin:10px 0; }
 
@@ -337,6 +373,12 @@ img{ max-width:100%; display:block; }
   flex-wrap:wrap;
   gap:10px;
   margin-top:16px;
+}
+
+/* ✅ NEW: Center section headings (FAQ + Models) */
+.sectionHead{
+  text-align:center;
+  margin-bottom: 18px;
 }
 
 /* ================= MODELS: Continuous marquee ================= */
@@ -395,9 +437,11 @@ img{ max-width:100%; display:block; }
   background: rgba(245,243,238,.05);
   overflow:hidden;
 }
+
+/* ✅ FIX: align works in RTL/LTR */
 .faqQ{
   width:100%;
-  text-align:right;
+  text-align:start;
   padding: 14px 14px;
   background: transparent;
   border: none;
