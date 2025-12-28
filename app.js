@@ -80,20 +80,6 @@
     return await res.json();
   }
 
-  // i18n
-  function applyI18n(dict, lang) {
-    document.documentElement.lang = (lang === "en" ? "en" : "ar");
-    document.documentElement.dir  = (lang === "en" ? "ltr" : "rtl");
-
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      if (dict?.[lang]?.[key]) el.textContent = dict[lang][key];
-    });
-
-    const btn = $("#langToggle");
-    if (btn) btn.textContent = (lang === "en" ? "AR" : "EN");
-  }
-
   const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
   async function decodeImages(rootEl){
     const imgs = Array.from(rootEl.querySelectorAll("img"));
@@ -315,25 +301,13 @@
     const problemImg = $("#problemImg");
     if (problemImg && cfg?.images?.problem) {
       problemImg.src = cfg.images.problem;
-      problemImg.alt = cfg?.i18n?.[lang]?.problem_title || "Problem";
+      problemImg.alt = (lang === "en")
+        ? "Why is finding the right apartment in Madinaty hard?"
+        : "لماذا صعب العثور على الشقة المناسبة في مدينتي؟";
     }
 
     const problemBox = $("#problemBullets");
     if (problemBox) {
-      const parent = problemBox.parentElement;
-      if (parent) {
-        const oldIntro = parent.querySelector(".problemIntro");
-        if (oldIntro) oldIntro.remove();
-
-        const introText = cfg?.content?.[lang]?.problemIntro;
-        if (introText) {
-          const p = document.createElement("p");
-          p.className = "problemIntro muted";
-          p.textContent = introText;
-          parent.insertBefore(p, problemBox);
-        }
-      }
-
       problemBox.innerHTML = "";
       (cfg?.content?.[lang]?.problemBullets || []).forEach(t => {
         const li = document.createElement("li");
@@ -345,7 +319,7 @@
     const whyImg = $("#whyImg");
     if (whyImg && cfg?.images?.why) {
       whyImg.src = cfg.images.why;
-      whyImg.alt = cfg?.i18n?.[lang]?.why_title || "Why";
+      whyImg.alt = (lang === "en") ? "Why Smart Select?" : "لماذا Smart Select؟";
     }
 
     const whyBox = $("#whyBullets");
@@ -373,31 +347,24 @@
     }
   }
 
-  function initLanguage(cfg) {
-    let lang = "ar";
-    const btn = $("#langToggle");
+  // ✅ Detect lang from page (index = ar, en.html = en)
+  function detectLang(){
+    const htmlLang = (document.documentElement.getAttribute("lang") || "").toLowerCase();
+    if (htmlLang.startsWith("en")) return "en";
+    return "ar";
+  }
 
-    const apply = () => {
-      applyI18n(cfg.i18n, lang);
-      renderSections(cfg, lang);
-    };
-
-    btn?.addEventListener("click", () => {
-      lang = (lang === "ar" ? "en" : "ar");
-      apply();
-    });
-
-    apply();
+  function boot(cfg){
+    setLinks(cfg);
+    initTopLinks();
+    initHeaderMenu();
+    const lang = detectLang();
+    renderSections(cfg, lang);
   }
 
   // Boot
   loadConfig()
-    .then(cfg => {
-      setLinks(cfg);
-      initTopLinks();
-      initHeaderMenu();
-      initLanguage(cfg);
-    })
+    .then(cfg => boot(cfg))
     .catch(err => {
       console.error(err);
       const hero = document.querySelector(".hero__subtitle");
