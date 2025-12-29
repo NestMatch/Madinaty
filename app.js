@@ -1,12 +1,12 @@
 // app.js
 (() => {
   const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
   // ============ Force "go to absolute top" for logo clicks ============
   function initTopLinks(){
-    document.querySelectorAll(".js-top").forEach(a => {
+    $$(".js-top").forEach(a => {
       a.addEventListener("click", (e) => {
-        // keep hash clean but ensure true top
         e.preventDefault();
         window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         history.replaceState(null, "", "#pageTop");
@@ -19,7 +19,7 @@
     const menu   = $("#hmenu");
     const btn    = $("#hmenuBtn");
     const panel  = $("#hmenuPanel");
-    const header = document.querySelector(".header");
+    const header = $(".header");
     if (!menu || !btn || !panel) return;
 
     function syncMenuTop(){
@@ -68,6 +68,7 @@
     window.addEventListener("resize", () => {
       if (menu.classList.contains("is-open")) syncMenuTop();
     });
+
     window.addEventListener("orientationchange", () => {
       if (menu.classList.contains("is-open")) setTimeout(syncMenuTop, 80);
     });
@@ -101,6 +102,7 @@
     const track = $("#cartrack");
     if (!track) return;
 
+    // cleanup previous listeners/raf
     if (track._rafId) { cancelAnimationFrame(track._rafId); track._rafId = null; }
     if (track._onResize) { window.removeEventListener("resize", track._onResize); track._onResize = null; }
     if (track._onVis) { document.removeEventListener("visibilitychange", track._onVis); track._onVis = null; }
@@ -292,7 +294,66 @@
     if (rep) rep.setAttribute("href", report);
   }
 
+  // ✅ NEW: Inject i18n text into existing HTML (no redesign)
+  function applyI18n(cfg, lang){
+    const t = cfg?.i18n?.[lang];
+    if (!t) return;
+
+    // Menu label (button text)
+    const menuLabel = $("#hmenuLabel");
+    if (menuLabel && (t.nav_problem || t.nav_why)) {
+      // keep your "Menu/القائمة" label, but if you want: uncomment next line
+      // menuLabel.textContent = (lang === "en") ? "Menu" : "القائمة";
+    }
+
+    // Menu links by href
+    const panel = $("#hmenuPanel");
+    if (panel) {
+      const aProblem = panel.querySelector('a[href="#problem"]');
+      const aWhy     = panel.querySelector('a[href="#why"]');
+      const aModels  = panel.querySelector('a[href="#models"]');
+      const aFaq     = panel.querySelector('a[href="#faq"]');
+
+      if (aProblem && t.nav_problem) aProblem.textContent = t.nav_problem;
+      if (aWhy && t.nav_why)         aWhy.textContent = t.nav_why;
+      if (aModels && t.nav_models)   aModels.textContent = t.nav_models;
+      if (aFaq && t.nav_faq)         aFaq.textContent = t.nav_faq;
+    }
+
+    // Hero title/subtitle (fallback by class)
+    const heroTitle = $(".hero__title");
+    const heroSub   = $(".hero__subtitle");
+    if (heroTitle && t.hero_title) heroTitle.textContent = t.hero_title;
+    if (heroSub && t.hero_subtitle) heroSub.textContent = t.hero_subtitle;
+
+    // CTA texts
+    const ctaHero = $("#ctaHero");
+    const ctaFooter = $("#ctaFooter");
+    const ctaReport = $("#ctaReport");
+    if (ctaHero && t.cta_request) ctaHero.textContent = t.cta_request;
+    if (ctaFooter && t.cta_request) ctaFooter.textContent = t.cta_request;
+    if (ctaReport && t.cta_sample) ctaReport.textContent = t.cta_sample;
+
+    // Section headings by section id
+    const hProblem = $('#problem .h2');
+    const hWhy     = $('#why .h2');
+    const hModels  = $('#models .h2');
+    const hFaq     = $('#faq .h2');
+
+    if (hProblem && t.problem_title) hProblem.textContent = t.problem_title;
+    if (hWhy && t.why_title)         hWhy.textContent = t.why_title;
+    if (hModels && t.models_title)   hModels.textContent = t.models_title;
+    if (hFaq && t.faq_title)         hFaq.textContent = t.faq_title;
+
+    // Footer note
+    const note = $("#footerNote");
+    if (note && t.footer_note) note.textContent = t.footer_note;
+  }
+
   function renderSections(cfg, lang) {
+    // ✅ apply i18n first (so SEO-visible headings/buttons become consistent)
+    applyI18n(cfg, lang);
+
     const heroBg = $("#heroBg");
     if (heroBg && cfg?.images?.heroBg) {
       heroBg.style.backgroundImage = `url("${cfg.images.heroBg}")`;
@@ -301,6 +362,7 @@
     const problemImg = $("#problemImg");
     if (problemImg && cfg?.images?.problem) {
       problemImg.src = cfg.images.problem;
+      // alt already good, keep it stable
       problemImg.alt = (lang === "en")
         ? "Why is finding the right apartment in Madinaty hard?"
         : "لماذا صعب العثور على الشقة المناسبة في مدينتي؟";
@@ -340,14 +402,9 @@
       const year = new Date().getFullYear();
       copy.textContent = `© ${year} Nest Match. All rights reserved.`;
     }
-
-    const note = $("#footerNote");
-    if (note) {
-      note.textContent = cfg?.i18n?.[lang]?.footer_note || "";
-    }
   }
 
-  // ✅ Detect lang from page (index = ar, en.html = en)
+  // Detect lang from page (index = ar, en.html = en)
   function detectLang(){
     const htmlLang = (document.documentElement.getAttribute("lang") || "").toLowerCase();
     if (htmlLang.startsWith("en")) return "en";
