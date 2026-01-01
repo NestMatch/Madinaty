@@ -7,24 +7,19 @@
   const YA = "\u064A";            // ي
   const ALEF_MAQSURA = "\u0649";  // ى
 
-  // ي تتحول لـ ى فقط لو بعدها: نهاية النص أو مسافة أو ترقيم/أقواس...
   const FINAL_YA_RE =
     /ي(?=$|[\s\u00A0\u2000-\u200A\u202F\u205F\u3000\)\]\}\>»"'\u060C\u061B\u061F\.,!?:;…])/g;
 
   function shouldSkipNode(node){
     if (!node) return true;
 
-    // skip if inside these tags
     const p = node.parentElement;
     if (!p) return false;
 
     const tag = p.tagName?.toLowerCase?.() || "";
     if (["script","style","noscript","textarea","input","select","option","code","pre"].includes(tag)) return true;
 
-    // skip editable areas
     if (p.isContentEditable) return true;
-
-    // skip elements explicitly opting out
     if (p.closest?.("[data-no-ya-fix]")) return true;
 
     return false;
@@ -54,14 +49,12 @@
     while (walker.nextNode()) {
       changed += replaceFinalYaInTextNode(walker.currentNode);
     }
-
     return changed;
   }
 
   function observeYaFix(root = document.body){
     if (!root) return;
 
-    // avoid double observers
     if (root._yaObserver) {
       try { root._yaObserver.disconnect(); } catch(e){}
       root._yaObserver = null;
@@ -69,12 +62,10 @@
 
     const obs = new MutationObserver((mutations) => {
       for (const m of mutations) {
-        // text changes
         if (m.type === "characterData" && m.target) {
           replaceFinalYaInTextNode(m.target);
           continue;
         }
-        // new nodes
         if (m.addedNodes && m.addedNodes.length) {
           m.addedNodes.forEach((n) => {
             if (n.nodeType === Node.TEXT_NODE) {
@@ -175,6 +166,7 @@
   }
 
   const nextFrame = () => new Promise(r => requestAnimationFrame(() => r()));
+
   async function decodeImages(rootEl){
     const imgs = Array.from(rootEl.querySelectorAll("img"));
     const tasks = imgs.map(img => {
@@ -190,12 +182,78 @@
     await Promise.all(tasks);
   }
 
-  // ============ Continuous Models Marquee (RTL SAFE) ============
+  // ================== LIGHTBOX (Models) ==================
+  function ensureLightbox(){
+    let lb = $("#lb");
+    if (lb) return lb;
+
+    lb = document.createElement("div");
+    lb.id = "lb";
+    lb.className = "lb";
+    lb.setAttribute("aria-hidden", "true");
+
+    lb.innerHTML = `
+      <div class="lb__backdrop" data-lb-close="1"></div>
+      <div class="lb__panel" role="dialog" aria-modal="true" aria-label="Image preview">
+        <button class="lb__close" type="button" aria-label="Close" data-lb-close="1">✕</button>
+        <img class="lb__img" id="lbImg" alt="Preview" />
+      </div>
+    `;
+
+    document.body.appendChild(lb);
+
+    const close = () => {
+      lb.classList.remove("is-open");
+      lb.setAttribute("aria-hidden","true");
+      document.body.classList.remove("menu-open"); // keep same lock style if you prefer
+      document.body.style.overflow = "";
+    };
+
+    lb.addEventListener("click", (e) => {
+      const t = e.target;
+      if (t && t.closest && t.closest("[data-lb-close]")) close();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && lb.classList.contains("is-open")) close();
+    });
+
+    lb._close = close;
+    return lb;
+  }
+
+  function openLightbox(src, alt){
+    const lb = ensureLightbox();
+    const img = $("#lbImg");
+    if (img) {
+      img.src = src || "";
+      img.alt = alt || "Preview";
+    }
+    lb.classList.add("is-open");
+    lb.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function wireSlidesForLightbox(track){
+    if (!track) return;
+
+    // Delegate click
+    track.addEventListener("click", (e) => {
+      const slide = e.target.closest(".slide");
+      if (!slide) return;
+      const img = slide.querySelector("img");
+      if (!img) return;
+
+      openLightbox(img.currentSrc || img.src, img.alt || "Preview");
+    });
+  }
+
+  // ============ Continuous Models Marquee (RTL SAFE + NO JITTER) ============
   function initModelsMarquee(items) {
     const track = $("#cartrack");
     if (!track) return;
 
-    // cleanup previous listeners/raf
+    // cleanup previous raf/listeners
     if (track._rafId) { cancelAnimationFrame(track._rafId); track._rafId = null; }
     if (track._onResize) { window.removeEventListener("resize", track._onResize); track._onResize = null; }
     if (track._onVis) { document.removeEventListener("visibilitychange", track._onVis); track._onVis = null; }
@@ -209,6 +267,7 @@
     const wrap = track.parentElement;
     if (!wrap) return;
 
+    // Force stable direction (avoid RTL flip issues)
     wrap.style.direction = "ltr";
     track.style.direction = "ltr";
     wrap.style.overflow = "hidden";
@@ -240,7 +299,7 @@
 
     const rebuild = async () => {
       track.innerHTML = "";
-      track.style.transform = "translateX(0px)";
+      track.style.transform = "translate3d(0,0,0)";
       singleSetWidth = 0;
 
       if (!items || !items.length) return;
@@ -251,23 +310,31 @@
       set1.appendChild(buildOneSet());
       track.appendChild(set1);
 
+      // Wait for layout + images decode
       await nextFrame();
       await decodeImages(track);
       await nextFrame();
 
-      singleSetWidth = Math.ceil(set1.getBoundingClientRect().width);
+      // ✅ Use precise width (avoid ceil wobble)
+      const w = set1.getBoundingClientRect().width;
+      singleSetWidth = w > 0 ? w : 0;
 
       const set2 = set1.cloneNode(true);
       track.appendChild(set2);
 
       await nextFrame();
+
+      // ✅ re-wire lightbox after rebuild
+      if (!track._lbWired) {
+        wireSlidesForLightbox(track);
+        track._lbWired = true;
+      }
     };
 
     let x = 0;
     let last = performance.now();
 
-    const isMobile = matchMedia("(max-width: 560px)").matches;
-    const SPEED = isMobile ? 85 : 120;
+    const SPEED = matchMedia("(max-width: 560px)").matches ? 85 : 120;
     const DIR = -1;
 
     let paused = false;
@@ -276,15 +343,19 @@
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
 
-      if (!singleSetWidth || singleSetWidth <= 0) {
+      if (!singleSetWidth || singleSetWidth <= 1) {
         track._rafId = requestAnimationFrame(tick);
         return;
       }
 
       if (!paused) {
         x += SPEED * dt;
+
+        // wrap
         if (x >= singleSetWidth) x -= singleSetWidth;
-        track.style.transform = `translateX(${DIR * x}px)`;
+
+        // ✅ translate3d for stability
+        track.style.transform = `translate3d(${DIR * x}px,0,0)`;
       }
 
       track._rafId = requestAnimationFrame(tick);
@@ -307,10 +378,15 @@
     track.addEventListener("touchstart", track._onTouchStart, { passive: true });
     track.addEventListener("touchend", track._onTouchEnd, { passive: true });
 
-    track._onResize = async () => {
-      x = 0;
-      last = performance.now();
-      await rebuild();
+    // ✅ Debounced resize (prevents repeated rebuild jitter)
+    let resizeT = null;
+    track._onResize = () => {
+      if (resizeT) clearTimeout(resizeT);
+      resizeT = setTimeout(async () => {
+        x = 0;
+        last = performance.now();
+        await rebuild();
+      }, 180);
     };
     window.addEventListener("resize", track._onResize);
 
@@ -376,7 +452,6 @@
       if (el) el.setAttribute("href", fb);
     });
 
-    // Email (if exists in DOM)
     const email = normalizeUrl(cfg?.links?.email) || "";
     ["#emailTop", "#emailFooter"].forEach(id => {
       const el = $(id);
@@ -498,7 +573,6 @@
       copy.textContent = `© ${year} Nest Match. All rights reserved.`;
     }
 
-    // ✅ after all dynamic text is injected, fix final-ya once
     fixYaDots(document.body);
   }
 
@@ -509,27 +583,24 @@
   }
 
   function boot(cfg){
-    // ✅ start observer early (covers any late injections)
     observeYaFix(document.body);
 
     setLinks(cfg);
     initTopLinks();
     initHeaderMenu();
+
     const lang = detectLang();
     renderSections(cfg, lang);
 
-    // ✅ safety: run again after load
     window.addEventListener("load", () => fixYaDots(document.body), { once: true });
   }
 
-  // Boot
   loadConfig()
     .then(cfg => boot(cfg))
     .catch(err => {
       console.error(err);
       const hero = document.querySelector(".hero__subtitle");
       if (hero) hero.textContent = "حدث خطأ في تحميل الإعدادات (site.json). تأكد من وجود الملف في config/site.json.";
-      // still try to apply final-ya fix
       observeYaFix(document.body);
       fixYaDots(document.body);
     });
