@@ -833,3 +833,34 @@ section[id]{
   .btn, .iconbtn{ transition: none; }
   .btn--gold:hover, .iconbtn:hover{ transform: none; }
 }
+/* ================= MOBILE FOOTER BUTTONS ORDER ================= */
+@media (max-width: 560px){
+
+  .footer__ctaRow{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+  }
+
+  /* ===== Arabic (RTL) ===== */
+  html[dir="rtl"] .footer__ctaRow{
+    flex-direction: row-reverse;   /* الزر الأساسي على اليمين */
+  }
+
+  /* ===== English (LTR) ===== */
+  html[dir="ltr"] .footer__ctaRow{
+    flex-direction: row;           /* الزر الأساسي على الشمال */
+  }
+
+  /* خلي زر اطلب تقريرك أوضح وأثقل بصريًا */
+  .footer__ctaRow .cta-main{
+    flex-shrink: 0;
+  }
+
+  /* باقي الأزرار */
+  .footer__ctaRow > :not(.cta-main){
+    opacity: .95;
+  }
+}
+
