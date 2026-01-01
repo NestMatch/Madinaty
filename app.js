@@ -3,6 +3,99 @@
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
+  // ================== 1) Fix FINAL ya only: (ي at end of word) -> ى ==================
+  const YA = "\u064A";            // ي
+  const ALEF_MAQSURA = "\u0649";  // ى
+
+  // ي تتحول لـ ى فقط لو بعدها: نهاية النص أو مسافة أو ترقيم/أقواس...
+  const FINAL_YA_RE =
+    /ي(?=$|[\s\u00A0\u2000-\u200A\u202F\u205F\u3000\)\]\}\>»"'\u060C\u061B\u061F\.,!?:;…])/g;
+
+  function shouldSkipNode(node){
+    if (!node) return true;
+
+    // skip if inside these tags
+    const p = node.parentElement;
+    if (!p) return false;
+
+    const tag = p.tagName?.toLowerCase?.() || "";
+    if (["script","style","noscript","textarea","input","select","option","code","pre"].includes(tag)) return true;
+
+    // skip editable areas
+    if (p.isContentEditable) return true;
+
+    // skip elements explicitly opting out
+    if (p.closest?.("[data-no-ya-fix]")) return true;
+
+    return false;
+  }
+
+  function replaceFinalYaInTextNode(tn){
+    if (!tn || !tn.nodeValue) return 0;
+    if (tn.nodeValue.indexOf(YA) === -1) return 0;
+    if (shouldSkipNode(tn)) return 0;
+
+    const before = tn.nodeValue;
+    const after = before.replace(FINAL_YA_RE, ALEF_MAQSURA);
+
+    if (after !== before) {
+      tn.nodeValue = after;
+      return 1;
+    }
+    return 0;
+  }
+
+  function fixYaDots(root = document.body){
+    if (!root) return;
+
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let changed = 0;
+
+    while (walker.nextNode()) {
+      changed += replaceFinalYaInTextNode(walker.currentNode);
+    }
+
+    return changed;
+  }
+
+  function observeYaFix(root = document.body){
+    if (!root) return;
+
+    // avoid double observers
+    if (root._yaObserver) {
+      try { root._yaObserver.disconnect(); } catch(e){}
+      root._yaObserver = null;
+    }
+
+    const obs = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        // text changes
+        if (m.type === "characterData" && m.target) {
+          replaceFinalYaInTextNode(m.target);
+          continue;
+        }
+        // new nodes
+        if (m.addedNodes && m.addedNodes.length) {
+          m.addedNodes.forEach((n) => {
+            if (n.nodeType === Node.TEXT_NODE) {
+              replaceFinalYaInTextNode(n);
+            } else if (n.nodeType === Node.ELEMENT_NODE) {
+              fixYaDots(n);
+            }
+          });
+        }
+      }
+    });
+
+    obs.observe(root, {
+      subtree: true,
+      childList: true,
+      characterData: true
+    });
+
+    root._yaObserver = obs;
+  }
+
   // ============ Force "go to absolute top" for logo clicks ============
   function initTopLinks(){
     $$(".js-top").forEach(a => {
@@ -283,7 +376,7 @@
       if (el) el.setAttribute("href", fb);
     });
 
-    // ✅ Email (natural place with contact links)
+    // Email (if exists in DOM)
     const email = normalizeUrl(cfg?.links?.email) || "";
     ["#emailTop", "#emailFooter"].forEach(id => {
       const el = $(id);
@@ -310,19 +403,11 @@
     if (rep) rep.setAttribute("href", report);
   }
 
-  // ✅ NEW: Inject i18n text into existing HTML (no redesign)
+  // i18n injection
   function applyI18n(cfg, lang){
     const t = cfg?.i18n?.[lang];
     if (!t) return;
 
-    // Menu label (button text)
-    const menuLabel = $("#hmenuLabel");
-    if (menuLabel && (t.nav_problem || t.nav_why)) {
-      // keep your "Menu/القائمة" label, but if you want: uncomment next line
-      // menuLabel.textContent = (lang === "en") ? "Menu" : "القائمة";
-    }
-
-    // Menu links by href
     const panel = $("#hmenuPanel");
     if (panel) {
       const aProblem = panel.querySelector('a[href="#problem"]');
@@ -336,13 +421,11 @@
       if (aFaq && t.nav_faq)         aFaq.textContent = t.nav_faq;
     }
 
-    // Hero title/subtitle (fallback by class)
     const heroTitle = $(".hero__title");
     const heroSub   = $(".hero__subtitle");
     if (heroTitle && t.hero_title) heroTitle.textContent = t.hero_title;
     if (heroSub && t.hero_subtitle) heroSub.textContent = t.hero_subtitle;
 
-    // CTA texts
     const ctaHero = $("#ctaHero");
     const ctaFooter = $("#ctaFooter");
     const ctaReport = $("#ctaReport");
@@ -350,7 +433,6 @@
     if (ctaFooter && t.cta_request) ctaFooter.textContent = t.cta_request;
     if (ctaReport && t.cta_sample) ctaReport.textContent = t.cta_sample;
 
-    // Section headings by section id
     const hProblem = $('#problem .h2');
     const hWhy     = $('#why .h2');
     const hModels  = $('#models .h2');
@@ -361,13 +443,11 @@
     if (hModels && t.models_title)   hModels.textContent = t.models_title;
     if (hFaq && t.faq_title)         hFaq.textContent = t.faq_title;
 
-    // Footer note
     const note = $("#footerNote");
     if (note && t.footer_note) note.textContent = t.footer_note;
   }
 
   function renderSections(cfg, lang) {
-    // ✅ apply i18n first (so SEO-visible headings/buttons become consistent)
     applyI18n(cfg, lang);
 
     const heroBg = $("#heroBg");
@@ -378,7 +458,6 @@
     const problemImg = $("#problemImg");
     if (problemImg && cfg?.images?.problem) {
       problemImg.src = cfg.images.problem;
-      // alt already good, keep it stable
       problemImg.alt = (lang === "en")
         ? "Why is finding the right apartment in Madinaty hard?"
         : "لماذا صعب العثور على الشقة المناسبة في مدينتي؟";
@@ -418,9 +497,11 @@
       const year = new Date().getFullYear();
       copy.textContent = `© ${year} Nest Match. All rights reserved.`;
     }
+
+    // ✅ after all dynamic text is injected, fix final-ya once
+    fixYaDots(document.body);
   }
 
-  // Detect lang from page (index = ar, en.html = en)
   function detectLang(){
     const htmlLang = (document.documentElement.getAttribute("lang") || "").toLowerCase();
     if (htmlLang.startsWith("en")) return "en";
@@ -428,11 +509,17 @@
   }
 
   function boot(cfg){
+    // ✅ start observer early (covers any late injections)
+    observeYaFix(document.body);
+
     setLinks(cfg);
     initTopLinks();
     initHeaderMenu();
     const lang = detectLang();
     renderSections(cfg, lang);
+
+    // ✅ safety: run again after load
+    window.addEventListener("load", () => fixYaDots(document.body), { once: true });
   }
 
   // Boot
@@ -442,6 +529,8 @@
       console.error(err);
       const hero = document.querySelector(".hero__subtitle");
       if (hero) hero.textContent = "حدث خطأ في تحميل الإعدادات (site.json). تأكد من وجود الملف في config/site.json.";
+      // still try to apply final-ya fix
+      observeYaFix(document.body);
+      fixYaDots(document.body);
     });
 })();
-
