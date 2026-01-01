@@ -602,43 +602,26 @@ section[id]{
 }
 
 /* ================= FOOTER (PRO) ================= */
+/* ================= FOOTER (PRO) ================= */
 .footer{
-  padding:22px 0;
+  padding: 24px 0 18px;
   border-top:1px solid rgba(208,179,113,.10);
   background: rgba(14,21,39,.94);
 }
 
 .footer__inner{
   display:flex;
-  align-items:flex-end;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* TOP: CTA + ICONS */
+.footer__top{
+  display:flex;
+  align-items:center;
   justify-content:space-between;
-  gap:18px;
-  flex-wrap:wrap;
-}
-
-/* left block: logo + note + copy */
-.footer__left{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  min-width: 260px;
-}
-.footer__note{
-  font-size:12px;
-  color: rgba(245,243,238,.58);
-  line-height: 1.7;
-}
-.footer__copy{
-  font-size:12px;
-  color: rgba(245,243,238,.55);
-}
-
-/* right block: CTA + icons aligned */
-.footer__right{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:12px;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .footer__ctaRow{
@@ -650,8 +633,92 @@ section[id]{
 .footer__icons{
   display:flex;
   gap:10px;
-  flex-wrap:wrap;
   align-items:center;
+  justify-content:flex-start;
+}
+
+/* BOTTOM: centered stacked block */
+.footer__bottom{
+  width: 100%;
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  padding-top: 14px;
+  margin-top: 4px;
+
+  border-top: 1px solid rgba(208,179,113,.10);
+}
+
+.footer__bottom .brand{
+  height: auto;
+  justify-content: center;
+}
+
+.footer__bottom .brand__logo--footer{
+  height: 58px;
+}
+
+.footer__note{
+  margin-top: 8px;
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: rgba(245,243,238,.62);
+  max-width: 720px;
+}
+
+.footer__copy{
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(245,243,238,.52);
+}
+
+/* ===== MOBILE PERFECT ===== */
+@media (max-width: 560px){
+  .footer{
+    padding: 22px 0 16px;
+  }
+
+  .footer__top{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .footer__ctaRow{
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footer__ctaRow .btn{
+    width: 100%;
+    max-width: 420px;
+    min-height: 46px;
+    white-space: normal;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .footer__icons{
+    justify-content: center;
+  }
+
+  .footer__bottom{
+    padding-top: 14px;
+  }
+
+  .footer__note{
+    font-size: 12px;
+    max-width: 520px;
+    padding-inline: 6px;
+  }
+
+  .footer__copy{
+    font-size: 11.5px;
+  }
 }
 
 /* ================= MOBILE ================= */
