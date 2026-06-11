@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<title>NestMatch — ابدأ بميزانيتك</title>
+<title>NestMatch — ابدأ استشارة واتساب</title>
 
 <meta name="description" content="NestMatch مستشار عقاري مستقل يعمل لصالح المشتري في مدينتي. نحلّل السوق ونقيّم الوحدات لنرشّح لك أفضل الاختيارات المتوافقة مع ميزانيتك واحتياجك." />
 <meta name="keywords" content="NestMatch, عقارات مدينتي, شراء شقة في مدينتي, مستشار عقاري مستقل, تحليل عقاري, أفضل قيمة مقابل سعر, Property Decision Intelligence" />
@@ -21,7 +21,7 @@
 <meta property="og:locale" content="ar_EG" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="NestMatch" />
-<meta property="og:title" content="NestMatch — ابدأ بميزانيتك" />
+<meta property="og:title" content="NestMatch — ابدأ استشارة واتساب" />
 <meta property="og:description" content="مستشار عقاري مستقل يعمل لصالح المشتري. نحلّل السوق ونقيّم الوحدات لنرشّح لك أفضل الاختيارات المتوافقة مع ميزانيتك واحتياجك." />
 <meta property="og:url" content="https://nestmatch.net/" />
 <meta property="og:image" content="https://nestmatch.net/nestmatch_assets/nestmatch-og.png" />
@@ -33,7 +33,7 @@
 
 <!-- Twitter / X Preview -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="NestMatch — ابدأ بميزانيتك" />
+<meta name="twitter:title" content="NestMatch — ابدأ استشارة واتساب" />
 <meta name="twitter:description" content="نحلّل السوق ونقيّم الوحدات لنرشّح لك أفضل الاختيارات المتوافقة مع ميزانيتك واحتياجك." />
 <meta name="twitter:image" content="https://nestmatch.net/nestmatch_assets/nestmatch-og.png" />
 
@@ -60,7 +60,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=Noto+Sans+Arabic:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
 <style>
 /* ── RESET ──────────────────────────────────────────── */
@@ -139,256 +139,7 @@ body {
 
 ::selection { background: rgba(201,168,76,.35); color: var(--navy-deep); }
 
-/* ════════════════════════════════════════════════════
-   SITE INTRO / PRELOADER
-   ════════════════════════════════════════════════════ */
-.site-intro {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 38%, #14304f 0%, transparent 62%),
-    linear-gradient(160deg, #0a1830 0%, var(--navy-deep) 60%, #050b16 100%);
-  overflow: hidden;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 900ms var(--ease-out-expo), visibility 0s linear 900ms;
-  perspective: 1200px;
-}
-.site-intro.intro-hidden {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* halo glow behind the wordmark */
-.intro-halo {
-  position: absolute;
-  width: 760px;
-  height: 760px;
-  border-radius: 50%;
-  pointer-events: none;
-  background: radial-gradient(circle, rgba(201,168,76,.20) 0%, rgba(201,168,76,.06) 38%, transparent 66%);
-  opacity: 0;
-  filter: blur(8px);
-  animation: introHalo 3.4s var(--ease-out-expo) forwards;
-}
-@keyframes introHalo {
-  0%   { opacity: 0; transform: scale(.7); }
-  35%  { opacity: 1; transform: scale(1); }
-  78%  { opacity: 1; transform: scale(1.04); }
-  100% { opacity: 0; transform: scale(1.12); }
-}
-
-/* faint drifting grid for depth */
-.intro-grid {
-  position: absolute;
-  inset: -20%;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
-  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 70%);
-  opacity: .5;
-  animation: introGridDrift 8s linear infinite;
-}
-@keyframes introGridDrift {
-  from { background-position: 0 0, 0 0; }
-  to   { background-position: 60px 60px, 60px 60px; }
-}
-
-/* wordmark with subtle 3D depth + golden reveal */
-.intro-stage {
-  position: relative;
-  z-index: 2;
-  margin-bottom: 0;
-  transform-style: preserve-3d;
-}
-.intro-wordmark {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(46px, 11vw, 104px);
-  letter-spacing: 3px;
-  line-height: 1;
-  display: inline-flex;
-  direction: ltr;
-  unicode-bidi: isolate;
-  transform-style: preserve-3d;
-  animation: introWordmark 2.6s var(--ease-out-expo) forwards;
-}
-.intro-wordmark .n { color: var(--gold); }
-.intro-wordmark .m { color: #fff; }
-@keyframes introWordmark {
-  0% {
-    opacity: 0;
-    transform: rotateX(34deg) translateY(46px) scale(.9);
-    filter: blur(14px);
-  }
-  55% {
-    opacity: 1;
-    transform: rotateX(-4deg) translateY(0) scale(1);
-    filter: blur(0);
-  }
-  78% { transform: rotateX(1.5deg) translateY(0) scale(1); }
-  100% { opacity: 1; transform: rotateX(0deg) translateY(0) scale(1); filter: blur(0); }
-}
-
-/* golden sheen sweeping across the wordmark */
-.intro-stage::after {
-  content: "";
-  position: absolute;
-  inset: -10% -30%;
-  pointer-events: none;
-  background: linear-gradient(115deg, transparent 38%, rgba(255,255,255,.42) 50%, transparent 62%);
-  transform: translateX(-130%);
-  animation: introSheen 2.4s var(--ease-out-expo) .55s forwards;
-  mix-blend-mode: overlay;
-}
-@keyframes introSheen {
-  0%   { transform: translateX(-130%); opacity: 0; }
-  30%  { opacity: 1; }
-  70%  { opacity: 1; }
-  100% { transform: translateX(130%); opacity: 0; }
-}
-
-/* mirror reflection of the wordmark */
-.intro-reflection {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 1;
-  margin-top: 0;
-  pointer-events: none;
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(46px, 11vw, 104px);
-  letter-spacing: 3px;
-  line-height: 1;
-  display: inline-flex;
-  direction: ltr;
-  unicode-bidi: isolate;
-  transform: translate(-50%, clamp(12px, 2.2vw, 24px)) scaleY(-1);
-  opacity: 0;
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.32), transparent 64%);
-  mask-image: linear-gradient(to bottom, rgba(0,0,0,.32), transparent 64%);
-  animation: introReflection 2.6s var(--ease-out-expo) forwards;
-}
-.intro-reflection .n { color: var(--gold); }
-.intro-reflection .m { color: #fff; }
-@keyframes introReflection {
-  0%  { opacity: 0; }
-  60% { opacity: .12; }
-  100% { opacity: .12; }
-}
-
-/* tagline — clear, calm, slow to appear, slow to leave */
-.intro-tagline {
-  position: relative;
-  z-index: 2;
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: clamp(15px, 2.6vw, 21px);
-  color: rgba(255,255,255,.86);
-  letter-spacing: .5px;
-  text-align: center;
-  opacity: 0;
-  margin-top: -2px;
-  transform: translateY(6px);
-  animation: introTagline 2.4s var(--ease-out-expo) .9s forwards;
-}
-.intro-tagline::before {
-  content: "";
-  display: block;
-  width: 46px;
-  height: 2px;
-  margin: 0 auto 8px;
-  border-radius: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  transform: scaleX(0);
-  transform-origin: center;
-  animation: introRule 1.4s var(--ease-out-expo) 1.05s forwards;
-}
-@keyframes introTagline {
-  0%   { opacity: 0; transform: translateY(6px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes introRule {
-  to { transform: scaleX(1); }
-}
-
-/* reduced motion: show a calm, instant intro then exit fast */
-@media (prefers-reduced-motion: reduce) {
-  .site-intro {
-    transition: opacity 300ms linear, visibility 0s linear 300ms;
-  }
-  .intro-halo,
-  .intro-grid,
-  .intro-stage::after,
-  .intro-reflection { display: none; }
-  .intro-wordmark,
-  .intro-tagline {
-    animation: none;
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
-  .intro-tagline::before { animation: none; transform: scaleX(1); }
-}
-
-/* page entrance once the intro completes */
-body:not(.intro-complete) {
-  overflow: hidden;
-  height: 100vh;
-}
-body.intro-complete main,
-body.intro-complete nav,
-body.intro-complete footer {
-  animation: pageRise 900ms var(--ease-out-expo) both;
-}
-@keyframes pageRise {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  body.intro-complete main,
-  body.intro-complete nav,
-  body.intro-complete footer { animation: none; }
-  body:not(.intro-complete) { overflow: auto; height: auto; }
-}
-
-/* ── GLOBAL INTERACTION LAYERS ─────────────────────── */
-.progress-bar {
-  position: fixed;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  height: 4px;
-  width: 0%;
-  z-index: 500;
-  background: linear-gradient(90deg, var(--gold), var(--gold-light), #fff3b6);
-  box-shadow: 0 0 22px rgba(201,168,76,.72);
-}
-.cursor-glow {
-  position: fixed;
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: .12;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(circle, var(--gold), transparent 62%);
-  filter: blur(12px);
-  transition: opacity .25s ease;
-}
-@media (hover: none) { .cursor-glow { display: none; } }
-
+/* ── GLOBAL BACKGROUND LAYER ───────────────────────── */
 body::before {
   content: "";
   position: fixed;
@@ -1355,6 +1106,7 @@ nav.is-scrolled::before { opacity: 1; }
   gap: 0;
   position: relative;
 }
+.steps-grid--four { grid-template-columns: repeat(4, 1fr); }
 .steps-line {
   position: absolute;
   top: 35px;
@@ -1622,61 +1374,6 @@ nav.is-scrolled::before { opacity: 1; }
 @keyframes stickyBreath {
   0%,100% { box-shadow: 0 18px 60px rgba(6,14,28,.35), 0 0 0 rgba(201,168,76,0); }
   50% { box-shadow: 0 18px 60px rgba(6,14,28,.35), 0 0 30px rgba(201,168,76,.34); }
-}
-
-/* ── DECISION PROGRESS RAIL ─────────────────────────── */
-.decision-progress {
-  position: fixed;
-  inset-inline-start: 18px;
-  inset-block-start: 50%;
-  transform: translateY(-42%) translateX(-14px);
-  z-index: 270;
-  display: grid;
-  gap: 10px;
-  padding: 14px 12px;
-  border-radius: 999px;
-  background: rgba(6,14,28,.34);
-  border: 1px solid rgba(255,255,255,.08);
-  box-shadow: 0 18px 60px rgba(0,0,0,.18);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .42s var(--ease-soft), transform .42s var(--ease-soft);
-}
-.decision-progress.is-visible {
-  opacity: 1;
-  transform: translateY(-50%) translateX(0);
-  pointer-events: auto;
-}
-.dp-item {
-  --dot: rgba(255,255,255,.22);
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: rgba(255,255,255,.46);
-  font-size: 10.5px;
-  font-weight: 900;
-  letter-spacing: .2px;
-  line-height: 1.25;
-  cursor: pointer;
-  transition: color .25s ease, transform .25s ease;
-}
-.dp-item::before {
-  content: "";
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--dot);
-  box-shadow: 0 0 0 0 rgba(201,168,76,0);
-  transition: background .25s ease, box-shadow .25s ease, transform .25s ease;
-}
-.dp-item:hover { color: rgba(255,255,255,.86); transform: translateX(2px); }
-.dp-item.is-active { color: var(--gold-light); transform: translateX(4px); }
-.dp-item.is-active::before {
-  background: var(--gold);
-  transform: scale(1.25);
-  box-shadow: 0 0 0 7px rgba(201,168,76,.12), 0 0 22px rgba(201,168,76,.45);
 }
 
 /* ── MICRO-INTERACTIONS ─────────────────────────────── */
@@ -2376,6 +2073,60 @@ footer {
   }
 }
 
+
+/* ── PERFORMANCE PASS ──────────────────────────────── */
+@media (max-width: 767px) {
+  html { scroll-behavior: auto; }
+  body::before,
+  .hero-grid-overlay,
+  .market-field,
+  .scan-line,
+  .engine-chip,
+  .hero-glow,
+  .cta-glow { display: none !important; }
+
+  .motion-safe .hero-grid-overlay,
+  .motion-safe .chaos-card,
+  .motion-safe .score-card,
+  .motion-safe .recommend-card,
+  .motion-safe .neutral-card,
+  .badge-pulse,
+  .sticky-cta a { animation: none !important; }
+
+  .reveal,
+  .reveal-delay-1,
+  .reveal-delay-2,
+  .reveal-delay-3,
+  .reveal-delay-4 {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  nav,
+  .decision-orbit,
+  .chaos-card,
+  .recommend-card,
+  .score-card,
+  .neutral-card,
+  .trust-panel,
+  .rc {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .hero-visual { min-height: 430px; }
+  .decision-orbit { border-radius: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce), (max-width: 767px) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
 /* ════════════════════════════════════════════════════
    RESPONSIVE
    ════════════════════════════════════════════════════ */
@@ -2426,7 +2177,7 @@ footer {
   .p-card { padding: 24px 22px; }
   .p-title { font-size: 18px; }
   .p-text { font-size: 14.5px; }
-  .steps-grid { grid-template-columns: 1fr; gap: 34px; }
+  .steps-grid, .steps-grid--four { grid-template-columns: 1fr; gap: 34px; }
   .steps-line { display: none; }
   .deliver-grid { grid-template-columns: 1fr; }
   .report-wrap { grid-template-columns: 1fr; gap: 38px; }
@@ -2438,7 +2189,6 @@ footer {
   .cta-steps { grid-template-columns: 1fr; }
   footer { flex-direction: column; text-align: center; padding-block: 24px 96px; }
   .sticky-cta.is-visible { display: flex; }
-  .intro-wordmark, .intro-reflection { letter-spacing: 1.5px; }
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
@@ -2446,6 +2196,7 @@ footer {
   .ba-arrow { min-height: 54px; transform: rotate(90deg); }
   .value-grid { grid-template-columns: repeat(2,1fr); }
   .value-card, .value-card:nth-child(2) { grid-column: auto; }
+  .steps-grid--four { grid-template-columns: repeat(2, 1fr); gap: 24px; }
   .deliver-grid, .report-wrap { grid-template-columns: 1fr; }
 }
 
@@ -2456,32 +2207,6 @@ footer {
 </style>
 </head>
 <body class="motion-safe">
-
-<!-- ═══════════════════════════════════════════════════
-     SITE INTRO / PRELOADER
-═══════════════════════════════════════════════════ -->
-<div class="site-intro" id="siteIntro" role="status" aria-live="polite" aria-label="جارٍ تحميل موقع NestMatch">
-  <div class="intro-grid" aria-hidden="true"></div>
-  <div class="intro-halo" aria-hidden="true"></div>
-  <div class="intro-stage">
-    <div class="intro-wordmark"><span class="n">Nest</span><span class="m">Match</span></div>
-  </div>
-  <div class="intro-reflection" aria-hidden="true"><span class="n">Nest</span><span class="m">Match</span></div>
-  <p class="intro-tagline">أول مستشار عقاري حقيقي يعمل لصالح المشتري</p>
-</div>
-
-<div class="progress-bar" id="progressBar" aria-hidden="true"></div>
-<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
-<div class="decision-progress" id="decisionProgress" aria-label="مراحل تجربة NestMatch" aria-hidden="true">
-  <a class="dp-item is-active" data-track="hero" href="#hero">البداية</a>
-  <a class="dp-item" data-track="problem" href="#problem">ألم السوق</a>
-  <a class="dp-item" data-track="value" href="#value">الحل</a>
-  <a class="dp-item" data-track="how" href="#how">كيف نعمل</a>
-  <a class="dp-item" data-track="criteria" href="#criteria">كيف نقيّم</a>
-  <a class="dp-item" data-track="services" href="#services">الخدمات</a>
-  <a class="dp-item" data-track="testimonials" href="#testimonials">تجارب العملاء</a>
-  <a class="dp-item" data-track="trust" href="#trust">لماذا نثق</a>
-</div>
 
 <!-- ═══════════════════════════════════════════════════
      NAV
@@ -2496,8 +2221,8 @@ footer {
     مستشار عقاري مستقل يعمل لصالح المشتري
   </div>
 
-  <a href="https://wa.me/201271028216?text=مرحباً%20—%20أريد%20خدمة%20ترشيح%20أفضل%20الاختيارات%20لشقة%20في%20مدينتي" class="nav-cta magnetic" target="_blank" rel="noopener">
-    ابدأ بميزانيتك
+  <a href="https://wa.me/201271028216?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%E2%80%94%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A8%D8%AF%D8%A1%20%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A9%20%D9%88%D8%A7%D8%AA%D8%B3%D8%A7%D8%A8%20%D9%85%D8%B9%20NestMatch%20%D9%84%D8%AA%D8%AD%D8%AF%D9%8A%D8%AF%20%D8%A7%D8%AD%D8%AA%D9%8A%D8%A7%D8%AC%D9%8A%20%D9%88%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%A3%D9%86%D8%B3%D8%A8%20%D8%AA%D8%B1%D8%B4%D9%8A%D8%AD%D8%A7%D8%AA%20%D8%A3%D9%88%20%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A7%D8%AA%20%D9%85%D8%AA%D8%A7%D8%AD%D8%A9%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%AA%D9%8A" class="nav-cta magnetic" target="_blank" rel="noopener">
+    ابدأ استشارة واتساب
   </a>
 </nav>
 
@@ -2517,7 +2242,7 @@ footer {
       </h1>
 
       <p class="hero-h2 reveal reveal-delay-2">
-        ابدأ بميزانيتك، ودعنا نرشّح لك أفضل الفرص المتاحة في السوق.
+        ابدأ استشارة واتساب، ودعنا نفهم احتياجك ثم نرشّح أو نقارن بناءً على أولوياتك.
       </p>
 
 
@@ -2530,8 +2255,8 @@ footer {
       </div>
 
       <div class="hero-ctas reveal reveal-delay-3">
-        <a href="https://wa.me/201271028216?text=مرحباً%20—%20أريد%20خدمة%20ترشيح%20أفضل%20الاختيارات%20لشقة%20في%20مدينتي" class="btn-primary magnetic" target="_blank" rel="noopener">
-          ترشيح أفضل الاختيارات
+        <a href="https://wa.me/201271028216?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%E2%80%94%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A8%D8%AF%D8%A1%20%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A9%20%D9%88%D8%A7%D8%AA%D8%B3%D8%A7%D8%A8%20%D9%85%D8%B9%20NestMatch%20%D9%84%D8%AA%D8%AD%D8%AF%D9%8A%D8%AF%20%D8%A7%D8%AD%D8%AA%D9%8A%D8%A7%D8%AC%D9%8A%20%D9%88%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%A3%D9%86%D8%B3%D8%A8%20%D8%AA%D8%B1%D8%B4%D9%8A%D8%AD%D8%A7%D8%AA%20%D8%A3%D9%88%20%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A7%D8%AA%20%D9%85%D8%AA%D8%A7%D8%AD%D8%A9%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%AA%D9%8A" class="btn-primary magnetic" target="_blank" rel="noopener">
+          ابدأ استشارة واتساب
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
 
@@ -2636,29 +2361,35 @@ footer {
     <header class="sec-hdr sec-hdr--center reveal">
       <span class="sec-label">طريقة العمل</span>
       <h2 class="sec-title" id="how-title">كيف نعمل لصالحك؟</h2>
-      <p class="sec-sub">نفس المنهج التحليلي، لكن المسار يختلف حسب مرحلتك: ترشيح أفضل الاختيارات من السوق، أو مقارنة مركّزة بين وحدات محددة.</p>
+      <p class="sec-sub">نبدأ باستلام بياناتك الأساسية، ثم نحدد استشارة مناسبة لفهم احتياجك بوضوح، وبعدها نحلّل الخيارات المتاحة ونقدّم لك ترشيحات أو مقارنة تساعدك تختار بثقة.</p>
     </header>
 
     <div class="steps-wrap reveal">
-      <div class="steps-grid">
+      <div class="steps-grid steps-grid--four">
         <div class="steps-line" aria-hidden="true"></div>
 
         <div class="step">
           <div class="step-circle"><span class="step-num">١</span></div>
-          <h3 class="step-title">نفهم ميزانيتك واحتياجك</h3>
-          <p class="step-text">نبدأ بما يناسبك فعلًا: الميزانية، المساحة، طريقة الدفع، الأولويات، ونمط السكن المطلوب.</p>
+          <h3 class="step-title">نستلم البيانات المطلوبة</h3>
+          <p class="step-text">تبدأ بإرسال بياناتك الأساسية: الميزانية، المساحة المطلوبة، طريقة الدفع، المنطقة المفضلة، وأي وحدات تفكر فيها حاليًا إن وجدت.</p>
         </div>
 
         <div class="step">
           <div class="step-circle"><span class="step-num">٢</span></div>
-          <h3 class="step-title">نحلّل السوق أو الوحدات المختارة</h3>
-          <p class="step-text">في خدمة الترشيح نحلّل السوق المتاح ونرشّح أفضل الاختيارات، وفي خدمة المقارنة نحلّل الوحدات التي أرسلتها ونكشف الفروق الحقيقية بينها.</p>
+          <h3 class="step-title">نحدد استشارة مناسبة لك</h3>
+          <p class="step-text">بعد مراجعة البيانات، نحدد معك استشارة عبر مكالمة، Zoom، أو مقابلة شخصية حسب الأنسب لفهم أولوياتك وشرح المسارات المتاحة.</p>
         </div>
 
         <div class="step">
           <div class="step-circle"><span class="step-num">٣</span></div>
-          <h3 class="step-title">نوضّح القرار ثم نتفاوض لصالحك</h3>
-          <p class="step-text">نساعدك على معرفة الوحدة الأقوى ولماذا، ثم ندعمك في التفاوض عند الحاجة، دون عمولة بيع تؤثر على مصلحتك كمشتري.</p>
+          <h3 class="step-title">نشرح الخيارات والفروقات</h3>
+          <p class="step-text">نوضح الفروق بين البدائل ونرتب الأولويات: السعر، المساحة، الاتجاه، الفيو، طريقة الدفع، جودة السكن، وقيمة الوحدة مقابل السعر.</p>
+        </div>
+
+        <div class="step">
+          <div class="step-circle"><span class="step-num">٤</span></div>
+          <h3 class="step-title">تحصل على قائمة ترشيحات واضحة</h3>
+          <p class="step-text">بعد التحليل، تحصل على قائمة مختصرة بالاختيارات الأنسب لك، أو مقارنة مركّزة بين الوحدات التي أرسلتها، مع توضيح أسباب الترشيح ونقاط القوة والضعف.</p>
         </div>
       </div>
     </div>
@@ -2741,7 +2472,7 @@ footer {
           </ul>
         </div>
 
-        <a href="https://wa.me/201271028216?text=مرحباً%20—%20أريد%20خدمة%20ترشيح%20أفضل%20الاختيارات%20لشقة%20في%20مدينتي" class="btn-outline magnetic service-btn" target="_blank" rel="noopener">ترشيح أفضل الاختيارات</a>
+        <a href="https://wa.me/201271028216?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%E2%80%94%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A8%D8%AF%D8%A1%20%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A9%20%D9%88%D8%A7%D8%AA%D8%B3%D8%A7%D8%A8%20%D9%85%D8%B9%20NestMatch%20%D9%84%D8%AA%D8%AD%D8%AF%D9%8A%D8%AF%20%D8%A7%D8%AD%D8%AA%D9%8A%D8%A7%D8%AC%D9%8A%20%D9%88%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%A3%D9%86%D8%B3%D8%A8%20%D8%AA%D8%B1%D8%B4%D9%8A%D8%AD%D8%A7%D8%AA%20%D8%A3%D9%88%20%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A7%D8%AA%20%D9%85%D8%AA%D8%A7%D8%AD%D8%A9%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%AA%D9%8A" class="btn-outline magnetic service-btn" target="_blank" rel="noopener">ابدأ استشارة واتساب</a>
       </article>
 
       <article class="service-card service-card--compare service-card--featured tilt-card">
@@ -2893,18 +2624,18 @@ footer {
   <div class="cta-glow" aria-hidden="true"></div>
   <div class="inner cta-section-inner">
     <div class="cta-wrap reveal">
-      <h2 class="cta-title" id="cta-title">اختر الخطوة المناسبة الآن</h2>
-      <p class="cta-sub">ابدأ بالمسار الأنسب لك: ترشيح اختيارات واضحة، أو مقارنة بين وحدات محددة.</p>
+      <h2 class="cta-title" id="cta-title">ابدأ باستشارة تحدد لك الطريق</h2>
+      <p class="cta-sub">أرسل بياناتك على واتساب، ثم نحدد معك أنسب طريقة للاستشارة قبل الترشيح أو المقارنة.</p>
 
       <div class="cta-steps">
-        <div class="cta-step"><b>١. ترشيح أفضل الاختيارات</b><span>لمن يريد قائمة مختصرة من أقوى الوحدات بدل التشتت بين البدائل.</span></div>
-        <div class="cta-step"><b>٢. مقارنة واضحة</b><span>لمن لديه وحدات معروضة عليه ويريد كشف الفروق الحقيقية بينها.</span></div>
-        <div class="cta-step"><b>٣. قرار وتفاوض</b><span>نساعدك على فهم القرار الأفضل ونقاط التفاوض الممكنة.</span></div>
+        <div class="cta-step"><b>١. أرسل بياناتك</b><span>الميزانية، المساحة، طريقة الدفع، وأي وحدات تفكر فيها.</span></div>
+        <div class="cta-step"><b>٢. نحدد الاستشارة</b><span>مكالمة، Zoom، أو مقابلة شخصية حسب الأنسب لك.</span></div>
+        <div class="cta-step"><b>٣. تستلم الترشيحات</b><span>قائمة واضحة أو مقارنة مركّزة مبنية على التحليل.</span></div>
       </div>
 
       <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px;">
-        <a href="https://wa.me/201271028216?text=مرحباً%20—%20أريد%20خدمة%20ترشيح%20أفضل%20الاختيارات%20لشقة%20في%20مدينتي" class="btn-primary magnetic" target="_blank" rel="noopener" style="min-width:240px;">
-          ترشيح أفضل الاختيارات
+        <a href="https://wa.me/201271028216?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%E2%80%94%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A8%D8%AF%D8%A1%20%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A9%20%D9%88%D8%A7%D8%AA%D8%B3%D8%A7%D8%A8%20%D9%85%D8%B9%20NestMatch%20%D9%84%D8%AA%D8%AD%D8%AF%D9%8A%D8%AF%20%D8%A7%D8%AD%D8%AA%D9%8A%D8%A7%D8%AC%D9%8A%20%D9%88%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%A3%D9%86%D8%B3%D8%A8%20%D8%AA%D8%B1%D8%B4%D9%8A%D8%AD%D8%A7%D8%AA%20%D8%A3%D9%88%20%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A7%D8%AA%20%D9%85%D8%AA%D8%A7%D8%AD%D8%A9%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%AA%D9%8A" class="btn-primary magnetic" target="_blank" rel="noopener" style="min-width:240px;">
+          ابدأ استشارة واتساب
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
         <a href="https://wa.me/201271028216?text=مرحباً%20—%20أريد%20مقارنة%20واضحة%20بين%20وحدات%20معروضة%20عليّ%20في%20مدينتي" class="btn-ghost magnetic" target="_blank" rel="noopener">
@@ -2926,8 +2657,8 @@ footer {
 </footer>
 
 <div class="sticky-cta" id="stickyCta">
-  <a href="https://wa.me/201271028216?text=مرحباً%20—%20أريد%20خدمة%20ترشيح%20أفضل%20الاختيارات%20لشقة%20في%20مدينتي" class="btn-primary magnetic" target="_blank" rel="noopener">
-    ترشيح أفضل الاختيارات
+  <a href="https://wa.me/201271028216?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D9%8B%20%E2%80%94%20%D8%A3%D8%B1%D9%8A%D8%AF%20%D8%A8%D8%AF%D8%A1%20%D8%A7%D8%B3%D8%AA%D8%B4%D8%A7%D8%B1%D8%A9%20%D9%88%D8%A7%D8%AA%D8%B3%D8%A7%D8%A8%20%D9%85%D8%B9%20NestMatch%20%D9%84%D8%AA%D8%AD%D8%AF%D9%8A%D8%AF%20%D8%A7%D8%AD%D8%AA%D9%8A%D8%A7%D8%AC%D9%8A%20%D9%88%D9%85%D8%B9%D8%B1%D9%81%D8%A9%20%D8%A3%D9%86%D8%B3%D8%A8%20%D8%AA%D8%B1%D8%B4%D9%8A%D8%AD%D8%A7%D8%AA%20%D8%A3%D9%88%20%D9%85%D9%82%D8%A7%D8%B1%D9%86%D8%A7%D8%AA%20%D9%85%D8%AA%D8%A7%D8%AD%D8%A9%20%D9%81%D9%8A%20%D9%85%D8%AF%D9%8A%D9%86%D8%AA%D9%8A" class="btn-primary magnetic" target="_blank" rel="noopener">
+    ابدأ استشارة واتساب
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
   </a>
 </div>
@@ -2939,56 +2670,18 @@ footer {
   const root = document.documentElement;
   const body = document.body;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (prefersReducedMotion) body.classList.remove('motion-safe');
+  const isSmallScreen = window.matchMedia('(max-width: 767px)').matches;
+  if (prefersReducedMotion || isSmallScreen) body.classList.remove('motion-safe');
 
   const qs = (selector, scope = document) => scope.querySelector(selector);
   const qsa = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
   const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
 
-  /* ── SITE INTRO ──────────────────────────────────── */
-  function initSiteIntro() {
-    const intro = qs('#siteIntro');
-    if (!intro) {
-      body.classList.add('intro-complete');
-      return;
-    }
-
-    const finish = () => {
-      if (body.classList.contains('intro-complete')) return;
-      intro.classList.add('intro-hidden');
-      body.classList.add('intro-complete');
-      window.scrollTo(0, 0);
-      // remove from DOM after the fade so it never blocks interaction
-      window.setTimeout(() => {
-        if (intro && intro.parentNode) intro.parentNode.removeChild(intro);
-      }, 1000);
-    };
-
-    if (prefersReducedMotion) {
-      window.setTimeout(finish, 600);
-      return;
-    }
-
-    // visible long enough to read the tagline calmly (~3.4s)
-    window.setTimeout(finish, 3400);
-    // hard safety fallback in case timers are throttled
-    window.setTimeout(() => {
-      if (!body.classList.contains('intro-complete')) finish();
-    }, 6000);
-  }
-
-  const progressBar = qs('#progressBar');
   const stickyCta = qs('#stickyCta');
-  const cursorGlow = qs('#cursorGlow');
   const nav = qs('nav');
-  const decisionProgress = qs('#decisionProgress');
 
   let ticking = false;
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let glowX = mouseX;
-  let glowY = mouseY;
 
   function updateGlobalScrollState() {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -2996,15 +2689,14 @@ footer {
     const progress = docHeight > 0 ? clamp(scrollTop / docHeight, 0, 1) : 0;
 
     root.style.setProperty('--scroll-progress', progress.toFixed(4));
-    if (progressBar) progressBar.style.width = (progress * 100) + '%';
     if (stickyCta) stickyCta.classList.toggle('is-visible', scrollTop > window.innerHeight * 0.55);
     if (nav) nav.classList.toggle('is-scrolled', scrollTop > 24);
-    if (decisionProgress) decisionProgress.classList.toggle('is-visible', scrollTop > window.innerHeight * 0.20);
 
     updateActiveNavigation();
-    updateDecisionProgress();
-    updateBeforeAfterMotion();
-    updateHeroParallax();
+    if (!isSmallScreen) {
+      updateBeforeAfterMotion();
+      updateHeroParallax();
+    }
 
     ticking = false;
   }
@@ -3037,23 +2729,6 @@ footer {
     });
   }
 
-  function updateDecisionProgress() {
-    if (!decisionProgress) return;
-    const stages = ['hero', 'problem', 'value', 'how', 'criteria', 'services', 'testimonials', 'trust'];
-    const y = window.scrollY + window.innerHeight * 0.42;
-    let current = 'hero';
-
-    stages.forEach((id) => {
-      const section = qs('#' + id);
-      if (!section) return;
-      if (y >= section.offsetTop) current = id;
-    });
-
-    qsa('.dp-item', decisionProgress).forEach((item) => {
-      item.classList.toggle('is-active', item.dataset.track === current);
-    });
-  }
-
   function updateBeforeAfterMotion() {
     const wrap = qs('.ba-wrap');
     if (!wrap) return;
@@ -3077,31 +2752,6 @@ footer {
       const depth = Number(el.dataset.depth || 0);
       const move = p * depth * 140;
       el.style.transform = 'translate3d(0,' + move.toFixed(2) + 'px,0)';
-    });
-  }
-
-  function initCursorGlow() {
-    if (!cursorGlow || prefersReducedMotion) return;
-
-    window.addEventListener('mousemove', (event) => {
-      mouseX = event.clientX;
-      mouseY = event.clientY;
-      root.style.setProperty('--mx', mouseX + 'px');
-      root.style.setProperty('--my', mouseY + 'px');
-    }, { passive: true });
-
-    function animateGlow() {
-      glowX += (mouseX - glowX) * 0.12;
-      glowY += (mouseY - glowY) * 0.12;
-      cursorGlow.style.left = glowX + 'px';
-      cursorGlow.style.top = glowY + 'px';
-      requestAnimationFrame(animateGlow);
-    }
-    animateGlow();
-
-    qsa('a, button, .tilt-card, .rc-metric').forEach((el) => {
-      el.addEventListener('mouseenter', () => { cursorGlow.style.opacity = '.22'; });
-      el.addEventListener('mouseleave', () => { cursorGlow.style.opacity = '.12'; });
     });
   }
 
@@ -3281,12 +2931,12 @@ footer {
   }
 
   function init() {
-    initSiteIntro();
-    initCursorGlow();
     initRevealAnimations();
-    initCounters();
-    initTiltCards();
-    initMagneticButtons();
+    if (!isSmallScreen) {
+      initCounters();
+      initTiltCards();
+      initMagneticButtons();
+    }
     initSmoothAnchors();
     updateGlobalScrollState();
   }
