@@ -58,9 +58,6 @@
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=Noto+Sans+Arabic:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
 <style>
 /* ── RESET ──────────────────────────────────────────── */
@@ -97,8 +94,8 @@ button, input, textarea { font: inherit; }
   --red:    #D85A30;
   --blue:   #7AA7FF;
 
-  --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Noto Sans Arabic', 'DM Sans', system-ui, sans-serif;
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Arial, sans-serif;
 
   --sp-xs:  8px;
   --sp-sm:  16px;
@@ -2204,9 +2201,120 @@ footer {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+
+/* ── PERFORMANCE PATCH: mobile-first, low repaint ───────────────── */
+html { scroll-behavior: auto; }
+body::before,
+.hero-glow,
+.hero-grid-overlay,
+.market-field,
+.scan-line,
+.engine-chip,
+.decision-orbit::after,
+.journey-visual::before,
+#how::after,
+.tilt-card::before { display: none !important; }
+
+*, *::before, *::after {
+  animation: none !important;
+  transition-duration: 120ms !important;
+}
+
+nav,
+.nav-positioning,
+.decision-orbit,
+.chaos-card,
+.recommend-card,
+.score-card,
+.neutral-card,
+.engine-chip,
+.trust-panel,
+.rc {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.section,
+.section--lg,
+#value,
+#how,
+#services,
+#deliverables,
+#report,
+#trust,
+#cta {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
+}
+
+.value-card,
+.p-card,
+.service-card,
+.deliver-item,
+.testimonial-card,
+.cta-step,
+.trust-item,
+.journey-step,
+.ba-col,
+.rc,
+.trust-panel {
+  box-shadow: 0 10px 28px rgba(6,14,28,.08) !important;
+  will-change: auto !important;
+  transform: none !important;
+}
+
+.value-card:hover,
+.p-card:hover,
+.service-card:hover,
+.deliver-item:hover,
+.ba-rec:hover,
+.btn-primary:hover,
+.btn-outline:hover,
+.btn-ghost:hover,
+.nav-cta:hover {
+  transform: none !important;
+}
+
+.reveal,
+.reveal-delay-1,
+.reveal-delay-2,
+.reveal-delay-3,
+.reveal-delay-4 {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.sticky-cta a { animation: none !important; }
+
+@media (max-width: 767px) {
+  body { line-height: 1.75; }
+  #hero { padding-block: 94px 42px !important; }
+  .section { padding-block: 42px !important; }
+  .section--lg { padding-block: 54px !important; }
+  .hero-visual,
+  .decision-orbit,
+  .chaos-card,
+  .score-card,
+  .recommend-card,
+  .neutral-card { display: none !important; }
+  .trust-strip { grid-template-columns: 1fr !important; }
+  .journey-visual,
+  .services-grid,
+  .problem-grid,
+  .value-grid,
+  .deliver-grid,
+  .report-wrap,
+  .cta-steps { grid-template-columns: 1fr !important; }
+  .journey-step,
+  .service-card { min-height: auto !important; }
+  .service-card { padding: 26px 20px !important; }
+  .sticky-cta { inset-inline: 12px; inset-block-end: 10px; }
+}
+
 </style>
 </head>
-<body class="motion-safe">
+<body>
 
 <!-- ═══════════════════════════════════════════════════
      NAV
@@ -2667,256 +2775,74 @@ footer {
 (function () {
   'use strict';
 
-  const root = document.documentElement;
-  const body = document.body;
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isSmallScreen = window.matchMedia('(max-width: 767px)').matches;
-  if (prefersReducedMotion || isSmallScreen) body.classList.remove('motion-safe');
-
   const qs = (selector, scope = document) => scope.querySelector(selector);
   const qsa = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
-  const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
-  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-
   const stickyCta = qs('#stickyCta');
   const nav = qs('nav');
-
+  const sections = qsa('section[id]');
+  const navLinks = qsa('.nav-links a');
   let ticking = false;
 
-  function updateGlobalScrollState() {
+  function onScroll() {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
-    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const progress = docHeight > 0 ? clamp(scrollTop / docHeight, 0, 1) : 0;
-
-    root.style.setProperty('--scroll-progress', progress.toFixed(4));
     if (stickyCta) stickyCta.classList.toggle('is-visible', scrollTop > window.innerHeight * 0.55);
     if (nav) nav.classList.toggle('is-scrolled', scrollTop > 24);
 
-    updateActiveNavigation();
-    if (!isSmallScreen) {
-      updateBeforeAfterMotion();
-      updateHeroParallax();
+    if (navLinks.length && sections.length) {
+      const y = scrollTop + window.innerHeight * 0.32;
+      let activeId = 'hero';
+      for (const section of sections) {
+        const top = section.offsetTop;
+        const bottom = top + section.offsetHeight;
+        if (y >= top && y < bottom) activeId = section.id;
+      }
+      for (const link of navLinks) {
+        const id = (link.getAttribute('href') || '').replace('#', '');
+        link.classList.toggle('is-active', id === activeId);
+      }
     }
-
     ticking = false;
   }
 
   function requestScrollUpdate() {
     if (!ticking) {
       ticking = true;
-      requestAnimationFrame(updateGlobalScrollState);
+      requestAnimationFrame(onScroll);
     }
   }
 
-  window.addEventListener('scroll', requestScrollUpdate, { passive: true });
-  window.addEventListener('resize', requestScrollUpdate, { passive: true });
-
-  function updateActiveNavigation() {
-    const sections = qsa('section[id]');
-    const navLinks = qsa('.nav-links a');
-    const y = window.scrollY + window.innerHeight * 0.32;
-    let activeId = 'hero';
-
-    sections.forEach((section) => {
-      const top = section.offsetTop;
-      const bottom = top + section.offsetHeight;
-      if (y >= top && y < bottom) activeId = section.id;
-    });
-
-    navLinks.forEach((link) => {
-      const id = (link.getAttribute('href') || '').replace('#', '');
-      link.classList.toggle('is-active', id === activeId);
-    });
-  }
-
-  function updateBeforeAfterMotion() {
-    const wrap = qs('.ba-wrap');
-    if (!wrap) return;
-    const rect = wrap.getBoundingClientRect();
-    const start = window.innerHeight * 0.82;
-    const end = window.innerHeight * 0.18;
-    const p = clamp((start - rect.top) / (start - end), 0, 1);
-    wrap.style.setProperty('--ba-progress', p.toFixed(3));
-  }
-
-  function updateHeroParallax() {
-    if (prefersReducedMotion) return;
-    const hero = qs('#hero');
-    if (!hero) return;
-    const rect = hero.getBoundingClientRect();
-    const visible = rect.bottom > 0 && rect.top < window.innerHeight;
-    if (!visible) return;
-
-    const p = clamp((-rect.top) / Math.max(rect.height - window.innerHeight * 0.4, 1), 0, 1);
-    qsa('[data-depth]', hero).forEach((el) => {
-      const depth = Number(el.dataset.depth || 0);
-      const move = p * depth * 140;
-      el.style.transform = 'translate3d(0,' + move.toFixed(2) + 'px,0)';
-    });
-  }
-
-  function initRevealAnimations() {
-    const revealEls = qsa('.reveal, .steps-wrap');
-    if (!('IntersectionObserver' in window) || prefersReducedMotion) {
-      revealEls.forEach((el) => el.classList.add('is-visible'));
-      return;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -70px 0px' });
-
-    revealEls.forEach((el) => observer.observe(el));
-  }
-
-  function initCounters() {
-    const counters = qsa('[data-count]');
-    if (!counters.length) return;
-
-    const runCounter = (el) => {
-      const target = Number(el.dataset.count || 0);
-      const prefix = el.dataset.prefix || '';
-      const suffix = el.dataset.suffix || '%';
-      const duration = prefersReducedMotion ? 1 : 1300;
-      const startTime = performance.now();
-      function tick(now) {
-        const p = clamp((now - startTime) / duration, 0, 1);
-        const value = Math.round(target * easeOutCubic(p));
-        el.textContent = prefix + value.toLocaleString('en-US') + suffix;
-        if (p < 1) requestAnimationFrame(tick);
-      }
-      requestAnimationFrame(tick);
-    };
-
-    if (!('IntersectionObserver' in window)) {
-      counters.forEach(runCounter);
-      return;
-    }
-
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        runCounter(entry.target);
-        counterObserver.unobserve(entry.target);
-      });
-    }, { threshold: 0.5 });
-
-    counters.forEach((el) => counterObserver.observe(el));
-  }
-
-  function initTiltCards() {
-    if (prefersReducedMotion || window.matchMedia('(hover: none)').matches) return;
-
-    qsa('.tilt-card').forEach((card) => {
-      card.addEventListener('mousemove', (event) => {
-        const rect = card.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        const px = x / rect.width;
-        const py = y / rect.height;
-        const rotateY = (px - 0.5) * -6;
-        const rotateX = (py - 0.5) * 6;
-
-        card.style.setProperty('--shine-x', (px * 100).toFixed(2) + '%');
-        card.style.setProperty('--shine-y', (py * 100).toFixed(2) + '%');
-        card.style.transform = 'perspective(950px) rotateX(' + rotateX.toFixed(2) + 'deg) rotateY(' + rotateY.toFixed(2) + 'deg) translateY(-6px)';
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-        card.style.setProperty('--shine-x', '50%');
-        card.style.setProperty('--shine-y', '50%');
-      });
-    });
-  }
-
-  function initMagneticButtons() {
-    if (prefersReducedMotion || window.matchMedia('(hover: none)').matches) return;
-
-    qsa('.magnetic').forEach((el) => {
-      el.addEventListener('mousemove', (event) => {
-        const rect = el.getBoundingClientRect();
-        const x = event.clientX - rect.left - rect.width / 2;
-        const y = event.clientY - rect.top - rect.height / 2;
-        el.style.transform = 'translate3d(' + (x * 0.10).toFixed(2) + 'px,' + (y * 0.18).toFixed(2) + 'px,0) translateY(-2px)';
-      });
-      el.addEventListener('mouseleave', () => {
-        el.style.transform = '';
-      });
-    });
+  function initReveal() {
+    qsa('.reveal, .steps-wrap').forEach((el) => el.classList.add('is-visible'));
   }
 
   function initReportTabs() {
     const reportData = [
-      {
-        b: 'B14', area: '107م²', budget: 'مناسبة', value: 'قوية', net: 'أفضل استغلال', view: 'Wide Garden', location: 'قريب ومناسب',
-        bars: [90, 84, 72],
-        verdict: '<strong>سبب الترشيح:</strong> هذا الاختيار يحقق توازنًا قويًا بين السعر، جودة السكن، وصافي المساحة مقارنة بالبدائل في نفس نطاق الميزانية.'
-      },
-      {
-        b: 'B12', area: '116م²', budget: 'أعلى قليلًا', value: 'متوسطة', net: 'جيد', view: 'Garden', location: 'موقع متوسط',
-        bars: [76, 88, 80],
-        verdict: '<strong>سبب الترشيح:</strong> هذا الاختيار أقوى من ناحية جودة السكن، لكنه يحتاج مقارنة مالية أدق لأنه أعلى قليلًا من الاختيار الأول.'
-      },
-      {
-        b: 'B11', area: '96م²', budget: 'أقل', value: 'مقبولة', net: 'تحميل أعلى', view: 'Street', location: 'أبعد نسبيًا',
-        bars: [68, 70, 62],
-        verdict: '<strong>سبب الترشيح:</strong> هذا الاختيار مناسب فقط إذا كانت الأولوية لتقليل الميزانية، لكنه أضعف من حيث الفيو والقيمة الإجمالية.'
-      }
+      { b: 'B14', area: '107م²', budget: 'مناسبة', value: 'قوية', net: 'أفضل استغلال', view: 'Wide Garden', location: 'قريب ومناسب', bars: [90, 84, 72], verdict: '<strong>سبب الترشيح:</strong> هذا الاختيار يحقق توازنًا قويًا بين السعر، جودة السكن، وصافي المساحة مقارنة بالبدائل في نفس نطاق الميزانية.' },
+      { b: 'B12', area: '116م²', budget: 'أعلى قليلًا', value: 'متوسطة', net: 'جيد', view: 'Garden', location: 'موقع متوسط', bars: [76, 88, 80], verdict: '<strong>سبب الترشيح:</strong> هذا الاختيار أقوى من ناحية جودة السكن، لكنه يحتاج مقارنة مالية أدق لأنه أعلى قليلًا من الاختيار الأول.' },
+      { b: 'B11', area: '96م²', budget: 'أقل', value: 'مقبولة', net: 'تحميل أعلى', view: 'Street', location: 'أبعد نسبيًا', bars: [68, 70, 62], verdict: '<strong>سبب الترشيح:</strong> هذا الاختيار مناسب فقط إذا كانت الأولوية لتقليل الميزانية، لكنه أضعف من حيث الفيو والقيمة الإجمالية.' }
     ];
-
     const tabs = qsa('[data-report-tab]');
     if (!tabs.length) return;
-
     const nodes = {
       b: qs('#repB'), area: qs('#repArea'), budget: qs('#repBudget'), value: qs('#repValue'),
       net: qs('#repNet'), view: qs('#repView'), location: qs('#repLocation'), verdict: qs('#repVerdict')
     };
     const bars = [qs('#barValue'), qs('#barQuality'), qs('#barPrivacy')];
     const barTexts = [qs('#barValueText'), qs('#barQualityText'), qs('#barPrivacyText')];
-    const reportBody = qs('.rc-body');
-
     function applyReport(index) {
       const data = reportData[index];
       tabs.forEach((tab, i) => tab.classList.toggle('is-active', i === index));
-      nodes.b.textContent = data.b;
-      nodes.area.textContent = data.area;
-      nodes.budget.textContent = data.budget;
-      nodes.value.textContent = data.value;
-      nodes.net.textContent = data.net;
-      nodes.view.textContent = data.view;
-      nodes.location.textContent = data.location;
-      nodes.verdict.innerHTML = data.verdict;
-
-      data.bars.forEach((val, i) => {
-        bars[i].style.width = '0%';
-        requestAnimationFrame(() => { bars[i].style.width = val + '%'; });
-        barTexts[i].textContent = val + '%';
+      Object.keys(nodes).forEach((key) => {
+        if (!nodes[key]) return;
+        if (key === 'verdict') nodes[key].innerHTML = data[key];
+        else nodes[key].textContent = data[key];
       });
-
-      if (reportBody && !prefersReducedMotion) {
-        reportBody.classList.remove('report-flash');
-        void reportBody.offsetWidth;
-        reportBody.classList.add('report-flash');
-      }
+      data.bars.forEach((val, i) => {
+        if (bars[i]) bars[i].style.width = val + '%';
+        if (barTexts[i]) barTexts[i].textContent = val + '%';
+      });
     }
-
-    function setReport(index) {
-      if (document.startViewTransition && !prefersReducedMotion) {
-        document.startViewTransition(() => applyReport(index));
-      } else {
-        applyReport(index);
-      }
-    }
-
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => setReport(Number(tab.dataset.reportTab)));
-    });
+    tabs.forEach((tab) => tab.addEventListener('click', () => applyReport(Number(tab.dataset.reportTab || 0)), { passive: true }));
   }
 
   function initSmoothAnchors() {
@@ -2925,27 +2851,21 @@ footer {
         const target = qs(link.getAttribute('href'));
         if (!target) return;
         event.preventDefault();
-        target.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth', block: 'start' });
+        target.scrollIntoView({ behavior: 'auto', block: 'start' });
       });
     });
   }
 
   function init() {
-    initRevealAnimations();
-    if (!isSmallScreen) {
-      initCounters();
-      initTiltCards();
-      initMagneticButtons();
-    }
+    initReveal();
+    initReportTabs();
     initSmoothAnchors();
-    updateGlobalScrollState();
+    onScroll();
+    window.addEventListener('scroll', requestScrollUpdate, { passive: true });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
 })();
 </script>
 </body>
